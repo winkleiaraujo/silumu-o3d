@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulação 3D</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene, camera, renderer, esfera1, esfera2, vetor1, vetor2;
+        let rodando = false;
+
+        // Função para iniciar e pausar a animação
+        function startPause() {
+            rodando = !rodando;
+        }
+
+        // Função para reiniciar a simulação
+        function reiniciar() {
+            esfera1.position.set(-22, 3, 0);
+            esfera2.position.set(22, 3, 0);
+            vetor1.position.set(esfera1.position.x, esfera1.position.y, esfera1.position.z);
+            vetor2.position.set(esfera2.position.x, esfera2.position.y, esfera2.position.z);
+            rodando = false;
+        }
+
+        // Função de inicialização
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+            // Renderizador
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // Criação das esferas
+            let geometry = new THREE.SphereGeometry(3, 32, 32);
+            let material1 = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+            esfera1 = new THREE.Mesh(geometry, material1);
+            esfera1.position.set(-22, 3, 0);
+            scene.add(esfera1);
+
+            let material2 = new THREE.MeshBasicMaterial({ color: 0x0000FF });
+            esfera2 = new THREE.Mesh(geometry, material2);
+            esfera2.position.set(22, 3, 0);
+            scene.add(esfera2);
+
+            // Vetores de velocidade
+            let arrowGeometry = new THREE.CylinderGeometry(0, 0.1, 10, 10);
+            let arrowMaterial = new THREE.MeshBasicMaterial({ color: 0x00FF00 });
+            vetor1 = new THREE.Mesh(arrowGeometry, arrowMaterial);
+            vetor1.position.set(-22, 3, 0);
+            scene.add(vetor1);
+
+            vetor2 = new THREE.Mesh(arrowGeometry, new THREE.MeshBasicMaterial({ color: 0xFFFF00 }));
+            vetor2.position.set(22, 3, 0);
+            scene.add(vetor2);
+
+            // Posição da câmera
+            camera.position.z = 50;
+
+            // Função de animação
+            function animate() {
+                requestAnimationFrame(animate);
+
+                if (rodando) {
+                    esfera1.position.x += 0.1;
+                    esfera2.position.x -= 0.1;
+
+                    // Atualização dos vetores de velocidade
+                    vetor1.position.set(esfera1.position.x, esfera1.position.y, esfera1.position.z);
+                    vetor2.position.set(esfera2.position.x, esfera2.position.y, esfera2.position.z);
+                }
+
+                renderer.render(scene, camera);
+            }
+
+            animate();
+        }
+
+        // Inicializar a cena
+        init();
+
+        // Eventos de teclado para controlar a simulação
+        window.addEventListener('keydown', function(event) {
+            if (event.key === 'p') {
+                startPause();  // Pressione "p" para iniciar/pausar
+            } else if (event.key === 'r') {
+                reiniciar();  // Pressione "r" para reiniciar
+            }
+        });
+    </script>
+</body>
+</html>
